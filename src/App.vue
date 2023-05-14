@@ -1,18 +1,110 @@
 <template>
-  <div>
-    <nav>
-      <router-link to="/">
-        Home
-      </router-link> |
-      <router-link to="/about">
-        About
-      </router-link>
-    </nav>
-    <router-view />
-  </div>
-</template>
+  <v-app id="inspire">
+    <v-layout>
+      <v-navigation-drawer
+        v-model="drawer"
+        temporary
+      >
+        <v-list>
+          <v-list-item
+            prepend-avatar="https://randomuser.me/api/portraits/lego/5.jpg"
+            title="User"
+          />
+        </v-list>
+        <v-divider />
+        <v-list
+          density="compact"
+          nav
+        >
+          <v-list-item
+            v-for="link in links"
+            :key="link"
+            :to="link.route"
+            :prepend-icon="link.icon"
+            :title="link.name"
+          />
+        </v-list>
+        <template #append>
+          <div class="pa-2">
+            <v-btn
+              block
+              to="/logout"
+              prepend-icon="mdi-logout"
+            >
+              Logout
+            </v-btn>
+          </div>
+        </template>
+      </v-navigation-drawer>
+      <v-main>
+        <v-app-bar
+          scroll-behavior="collapse" 
+          :elevation="2"
+          class="px-3"
+          flat
+          dense
+        >
+          <template #prepend>
+            <v-app-bar-nav-icon 
+              text="Menu"
+              @click.stop="drawer = !drawer"
+            />
+          </template>
+          <v-app-bar-title prepend-icon="mdi-calculator-variant">
+            Arithmetic calculator
+          </v-app-bar-title>
+          <v-spacer />
+          <v-btn
+            icon
+            to="/logout"
+          >
+            <v-icon>mdi-logout</v-icon>
+          </v-btn>
+        </v-app-bar>
+        <v-container>
+          <v-row>
+            <v-col
+              cols="12"
+              sm="2"
+            />
 
+            <v-col
+              cols="12"
+              sm="8"
+            >
+              <v-sheet
+                min-height="70vh"
+                rounded="lg"
+              >
+                <router-view />
+              </v-sheet>
+            </v-col>
 
+            <v-col
+              cols="12"
+              sm="2"
+            />
+          </v-row>
+        </v-container>
+      </v-main>
+    </v-layout>
+  </v-app>
+</template>    
+
+<script>
+export default {
+  name: "App",
+  components: {},
+  data: () => ({
+      drawer: null,
+      links: [
+        {name: 'Home', route: "/", icon: "mdi-home-assistant"},
+        {name: 'Operation', route: "/operation", icon: "mdi-calculator"},
+        {name: 'Records', route: "/records", icon: "mdi-google-spreadsheet"},
+      ],
+    }),
+};
+</script>
 <style>
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
