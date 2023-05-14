@@ -3,7 +3,6 @@ const moment = require('moment');
 
 const apiUrl = process.env.VUE_APP_CALCULATOR_API_URL
 const apiVersion = process.env.VUE_APP_CALCULATOR_API_VERSION
-console.log('apiUrl????', apiUrl, apiVersion);
 const api = axios.create({
   baseURL: apiUrl,
   headers: {
@@ -25,7 +24,6 @@ export default {
         const currentDate = moment().utc().format("YYYY-MM-DD");
         const uuid = '05ccc18b-aef0-4087-ba12-02c977d4988c';
         const passId = `${uuid}-${currentDate}`;
-        console.log('enter????', passId, username, password);
 
         const response = await api.post('/auth/getToken', {
           passId,
