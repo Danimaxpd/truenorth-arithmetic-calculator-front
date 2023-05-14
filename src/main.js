@@ -9,12 +9,12 @@ import * as directives from 'vuetify/directives'
 import { md3 } from 'vuetify/blueprints'
 
 const myCustomLightTheme = {
-    dark: false,
+    dark: true,
     colors: {
-      background: '#FFFFFF',
-      surface: '#FFFBE6',
-      primary: '#356859',
-      'primary-darken-1': '#37966F',
+      background: '#27272f',
+      surface: '#33333d',
+      primary: '#1EB980',
+      'primary-darken-1': '#045D56',
       secondary: '#FD5523',
       'secondary-darken-1': '#FFFBE6',
       error: '#B00020',
