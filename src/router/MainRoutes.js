@@ -1,6 +1,9 @@
 const MainRoutes = {
     path: '/auth',
     component: () => import('@/layouts/MainLayout.vue'),
+    meta: {
+        requiresAuth: true
+    },
     children: [
         {
             path: '/home',
@@ -33,5 +36,7 @@ const MainRoutes = {
         // }
     ]
 };
+
+
 
 export default MainRoutes

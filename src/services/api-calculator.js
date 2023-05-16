@@ -22,7 +22,7 @@ export default {
     async login(username, password) {
       try {
         const currentDate = moment().utc().format("YYYY-MM-DD");
-        const uuid = '05ccc18b-aef0-4087-ba12-02c977d4988c';
+        const uuid = process.env.VUE_APP_CALCULATOR_API_VALID_PASS_ID;
         const passId = `${uuid}-${currentDate}`;
 
         const response = await api.post('/auth/getToken', {
@@ -30,9 +30,9 @@ export default {
           username,
           password,
         })
-        return response.data.data
+        return response.data
       } catch (error) {
-        throw new Error(error.message)
+        throw new Error(error)
       }
     },
 }

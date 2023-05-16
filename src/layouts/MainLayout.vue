@@ -28,8 +28,8 @@
           <div class="pa-2">
             <v-btn
               block
-              to="/logout"
               prepend-icon="mdi-logout"
+              @click="handleLogout"
             >
               Logout
             </v-btn>
@@ -56,7 +56,7 @@
           <v-spacer />
           <v-btn
             icon
-            to="/logout"
+            @click="handleLogout"
           >
             <v-icon>mdi-logout</v-icon>
           </v-btn>
@@ -92,6 +92,7 @@
 </template>    
 
   <script>
+  import { mapActions } from 'vuex';
   export default {
     name: "MainLayout",
     components: {},
@@ -103,6 +104,13 @@
           {name: 'Records', route: "/records", icon: "mdi-google-spreadsheet"},
         ],
       }),
+    methods: {
+      ...mapActions(['logout']),
+      handleLogout() {
+        this.logout();
+        this.$router.push('/');
+      }
+    }
   };
   </script>
   <style>

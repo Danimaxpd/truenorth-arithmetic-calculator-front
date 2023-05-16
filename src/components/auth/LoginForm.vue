@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-form 
-      v-model="valid" 
+    <v-form
+      v-model="valid"
       @submit.prevent="handleSubmit"
     >
       <v-row class="d-flex mb-3">
@@ -40,48 +40,80 @@
         </v-col>
       </v-row>
     </v-form>
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 <script>
-import calculatorApi from '@/services/api-calculator'
+import { mapState, mapActions } from 'vuex';
 
 export default {
-data: () => ({
-      valid: false,
-      username: '',
-      password: '',
-      usernameRules: [
-        value => {
-          if (value) return true
+  data: () => ({
+    valid: false,
+    username: '',
+    password: '',
+    usernameRules: [
+      value => {
+        if (value) return true
 
-          return 'Name is required.'
-        },
-        value => {
-          if (value?.length <= 10) return true
+        return 'Name is required.'
+      },
+      value => {
+        if (value?.length <= 10) return true
 
-          return 'Name must be less than 10 characters.'
-        },
-      ],
-      passwordRules: [
-        value => {
-          if (value) return true
+        return 'Name must be less than 10 characters.'
+      },
+    ],
+    passwordRules: [
+      value => {
+        if (value) return true
 
-          return 'Password is required.'
-        },
-        value => {
-          if (value?.length >= 3) return true
+        return 'Password is required.'
+      },
+      value => {
+        if (value?.length >= 3) return true
 
-          return 'Password must be valid.'
-        },
-      ],
-    }),
+        return 'Password must be valid.'
+      },
+    ],
+    snackbar: {
+      show: false,
+      message: '',
+      color: '',
+      timeout: 3000
+    }
+  }),
+  computed: {
+    ...mapState(['isAuthenticated'])
+  },
+  mounted() {
+    if (this.isAuthenticated) {
+      this.$router.push('/home');
+    }
+  },
   methods: {
+    ...mapActions(['login']),
     async handleSubmit() {
       try {
-        await calculatorApi.login(this.username, this.password)
-        // do something with the response data
-      } catch (error) {
-        console.log(error)
+        if (this.valid) {
+            await this.login({
+            username: this.username,
+            password: this.password
+          });
+          this.$router.push('/home');
+        }
+      } catch (e) {
+          this.snackbar = {
+            show: true,
+            message: 'Authentication failed. Please check your credentials.',
+            color: 'error',
+            timeout: 3000
+          };
       }
     },
   },
