@@ -10,7 +10,7 @@
         <v-list>
           <v-list-item
             prepend-avatar="https://randomuser.me/api/portraits/lego/5.jpg"
-            title="User"
+            :title="userName"
           />
         </v-list>
         <v-divider />
@@ -40,14 +40,14 @@
       </v-navigation-drawer>
       <v-main>
         <v-app-bar
-          scroll-behavior="collapse" 
+          scroll-behavior="collapse"
           :elevation="2"
           class="px-3"
           flat
           dense
         >
           <template #prepend>
-            <v-app-bar-nav-icon 
+            <v-app-bar-nav-icon
               text="Menu"
               @click.stop="drawer = !drawer"
             />
@@ -69,7 +69,7 @@
               cols="12"
               sm="2"
             />
-  
+
             <v-col
               cols="12"
               sm="8"
@@ -82,7 +82,7 @@
                 <router-view />
               </v-sheet>
             </v-col>
-  
+
             <v-col
               cols="12"
               sm="2"
@@ -94,48 +94,52 @@
   </v-app>
 </template>    
 
-  <script>
-  import { mapActions } from 'vuex';
-  export default {
-    name: "MainLayout",
-    components: {},
-    data: () => ({
-        drawer: null,
-        links: [
-          {name: 'Home', route: "/home", icon: "mdi-home-assistant"},
-          {name: 'Operation', route: "/operation", icon: "mdi-calculator"},
-          {name: 'Records', route: "/records", icon: "mdi-google-spreadsheet"},
-        ],
-      }),
-    methods: {
-      ...mapActions(['logout']),
-      handleLogout() {
-        this.logout();
-        this.$router.push('/');
-      }
+<script>
+import { mapActions } from 'vuex';
+export default {
+  name: "MainLayout",
+  data: () => ({
+    drawer: null,
+    links: [
+      { name: 'Home', route: "/home", icon: "mdi-home-assistant" },
+      { name: 'Operation', route: "/operation", icon: "mdi-calculator" },
+      { name: 'Records', route: "/records", icon: "mdi-google-spreadsheet" },
+    ],
+  }),
+  computed: {
+    userName() {
+      return this.$store.getters.getUserName;
+    },
+  },
+  methods: {
+    ...mapActions(['logout']),
+    handleLogout() {
+      this.logout();
+      this.$router.push('/');
     }
-  };
-  </script>
-  <style>
-  #inspire {
-    font-family: Avenir, Helvetica, Arial, sans-serif;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-    text-align: center;
-    color: #2c3e50;
   }
-  
-  nav {
-    padding: 30px;
-  }
-  
-  nav a {
-    font-weight: bold;
-    color: #2c3e50;
-  }
-  
-  nav a.router-link-exact-active {
-    color: #42b983;
-  }
-  </style>
+};
+</script>
+<style>
+#inspire {
+  font-family: Avenir, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: center;
+  color: #2c3e50;
+}
+
+nav {
+  padding: 30px;
+}
+
+nav a {
+  font-weight: bold;
+  color: #2c3e50;
+}
+
+nav a.router-link-exact-active {
+  color: #42b983;
+}
+</style>
   
