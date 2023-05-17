@@ -1,5 +1,14 @@
 <template>
-  <div class="about">
-    <h1>This is an Records</h1>
+  <div>
+    <RecordsTableVue />
   </div>
 </template>
+<script>
+import RecordsTableVue from '@/components/RecordsTable.vue';
+
+export default {
+  components: {
+    RecordsTableVue
+  }
+}
+</script>
