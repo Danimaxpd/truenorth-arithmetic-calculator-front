@@ -3,7 +3,9 @@
     <v-layout>
       <v-navigation-drawer
         v-model="drawer"
-        temporary
+        :rail="rail"
+        permanent
+        @click="rail = false"
       >
         <v-list>
           <v-list-item
@@ -75,6 +77,7 @@
               <v-sheet
                 min-height="70vh"
                 rounded="lg"
+                class="pt-4"
               >
                 <router-view />
               </v-sheet>
