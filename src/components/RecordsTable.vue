@@ -1,10 +1,80 @@
 <template>
   <div>
-    <input
-      v-model="filterText"
-      type="text"
-      placeholder="Search"
-    >
+    <v-container>
+      <v-row>
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <v-card
+            class="mx-auto"
+            color="grey-lighten-3"
+          >
+            <v-card-text>
+              <v-text-field
+                v-model="filterText"
+                :loading="loading"
+                density="compact"
+                variant="solo"
+                label="Search in table"
+                append-inner-icon="mdi-magnify"
+                single-line
+                hide-details
+              />
+            </v-card-text>
+          </v-card>
+        </v-col>
+        <v-col
+          cols="12"
+          md="2"
+        >
+          <div
+            class="alert alert-light"
+            role="alert"
+          >
+            <v-select
+              v-model="orderBy"
+              :items="headers"
+              label="Order By"
+              variant="underlined"
+            />
+          </div>
+        </v-col>
+        <v-col
+          cols="12"
+          md="2"
+        >
+          <div
+            class="alert alert-light"
+            role="alert"
+          >
+            <v-select
+              v-model="orderByDirection"
+              :items="orderByDirections"
+              label="Direction"
+              variant="underlined"
+            />
+          </div>
+        </v-col>
+        <v-col
+          cols="12"
+          md="4"
+        >
+          <div
+            class="alert alert-light"
+            role="alert"
+          >
+            <v-select
+              v-model="recordsPerPage"
+              :items="arrRecordsPerPage"
+              label="Records Per Page"
+              variant="underlined"
+            />
+          </div>
+        </v-col>
+      </v-row>
+    </v-container>
+
     <table class="table table-striped table-hover">
       <thead>
         <tr>
@@ -19,7 +89,7 @@
       </thead>
       <tbody>
         <tr
-          v-for="record in filteredRecords"
+          v-for="record in filteredData"
           :key="record.id"
         >
           <td>{{ record.id }}</td>
@@ -78,186 +148,149 @@
 </template>
 
 <script>
+import calculatorApi from "@/services/api-calculator";
+
 export default {
   data() {
     return {
-      filterText: '',
+      filterText: "",
       currentPage: 1,
       totalPages: 0,
       recordsPerPage: 10,
+      arrRecordsPerPage: [5, 10, 50, 100],
+      orderDirections: ['asc', 'desc'],
+      orderBy: "",
+      orderByDirection: 'asc',
+      headers: [
+        {
+          title: "ID",
+          value: "id",
+        },
+        {
+          title: "Operation ID",
+          value: "operation_id",
+        },
+        {
+          title: "User ID",
+          value: "user_id",
+        },
+        {
+          title: "Amount",
+          value: "amount",
+        },
+        {
+          title: "User Balance",
+          value: "user_balance",
+        },
+        {
+          title: "Operation Response",
+          value: "operation_response",
+        },
+      ],
+      filteredData:[],
       data: {
         records: [],
         metadata: {
           totalCount: 0,
           currentPage: 1,
-          totalPages: 0
-        }
-      }
+          totalPages: 0,
+        },
+      },
     };
   },
-  computed: {
+  mounted() {
+    this.fetchData();
+    this.filteredRecords();
+  },
+  methods: {
+    async changePage(page) {
+      if (page >= 1 && page <= this.totalPages) {
+        this.currentPage = page;
+        await this.fetchData();
+      }
+    },
+    async fetchData() {
+      try {
+        const filters = this.constructFilters();
+        const response = await calculatorApi.getRecords(filters);
+        const data = response.data;
+        this.data = data;
+        // Set initial values
+        this.currentPage = this.data.metadata.currentPage;
+        this.totalPages = this.data.metadata.totalPages;
+        this.filteredRecords();
+      } catch (error) {
+        this.snackbar = {
+          show: true,
+          message: "Error getting Records Info",
+          color: "error",
+          timeout: 3000,
+        };
+      }
+    },
+    stringFilter(type, value) {
+      let result = "";
+      switch (type) {
+        case "skip":
+          result = `skip=${value}`;
+          break;
+        case "take":
+          result = `take=${value}`;
+          break;
+        case "orderBy":
+          result = `orderBy=${value}`;
+          break;
+        case "where":
+          result = `where=${value}`;
+          break;
+      }
+      return result;
+    },
+    constructFilters(){
+      const start = (this.currentPage - 1) * this.recordsPerPage;
+      const end = start + this.recordsPerPage;
+
+      const filters = [];
+
+      const filterStart = this.stringFilter('skip', start);
+      if (filterStart) {
+        filters.push(filterStart);
+      }
+
+      const filterEnd = this.stringFilter('take', end);
+      if (filterEnd) {
+        filters.push(filterEnd);
+      }
+
+      const filterOrderBy = this.stringFilter('orderBy', `"${this.orderBy}": "${this.orderByDirection}"`);
+      if (this.orderBy) {
+        filters.push(filterOrderBy);
+      }
+
+      const filterWhere = this.stringFilter('where', '{"deleted": false}');
+      if (filterWhere) {
+        filters.push(filterWhere);
+      }
+
+      return filters.join('');
+    },
     filteredRecords() {
       const start = (this.currentPage - 1) * this.recordsPerPage;
       const end = start + this.recordsPerPage;
-      return this.data.records.filter(record => {
-        return (
-          record.id.toString().includes(this.filterText) ||
-          record.operation_id.toString().includes(this.filterText) ||
-          record.user_id.toString().includes(this.filterText) ||
-          record.amount.toString().includes(this.filterText) ||
-          record.user_balance.toString().includes(this.filterText) ||
-          record.operation_response.includes(this.filterText) ||
-          record.date.includes(this.filterText)
-        );
-      }).slice(start, end);
-    },
-    fetchData(filters) {
-      console.logs(filters);
-      return false;
-    },
-  },
-  mounted() {
-    // Simulated API data response
-    this.data = {
-      "records": [
-            {
-                "id": 1,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 90,
-                "operation_response": "Success",
-                "date": "2023-05-11T19:24:57.953Z",
-                "deleted": false,
-                "createdAt": "2023-05-11T19:24:57.953Z",
-                "updatedAt": "2023-05-11T19:24:57.953Z"
-            },
-            {
-                "id": 2,
-                "operation_id": 6,
-                "user_id": 1,
-                "amount": 15,
-                "user_balance": 75,
-                "operation_response": "Success",
-                "date": "2023-05-11T19:59:37.134Z",
-                "deleted": false,
-                "createdAt": "2023-05-11T19:59:37.134Z",
-                "updatedAt": "2023-05-11T19:59:37.134Z"
-            },
-            {
-                "id": 3,
-                "operation_id": 2,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 0,
-                "operation_response": "Success",
-                "date": "2023-05-11T21:57:34.346Z",
-                "deleted": false,
-                "createdAt": "2023-05-11T21:57:34.346Z",
-                "updatedAt": "2023-05-11T21:57:34.346Z"
-            },
-            {
-                "id": 5,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 920,
-                "operation_response": "Success",
-                "date": "2023-05-17T04:59:43.955Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T04:59:43.955Z",
-                "updatedAt": "2023-05-17T04:59:43.955Z"
-            },
-            {
-                "id": 6,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 910,
-                "operation_response": "Success",
-                "date": "2023-05-17T05:00:17.886Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T05:00:17.886Z",
-                "updatedAt": "2023-05-17T05:00:17.886Z"
-            },
-            {
-                "id": 7,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 900,
-                "operation_response": "Success",
-                "date": "2023-05-17T05:01:39.712Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T05:01:39.712Z",
-                "updatedAt": "2023-05-17T05:01:39.712Z"
-            },
-            {
-                "id": 8,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 890,
-                "operation_response": "Success",
-                "date": "2023-05-17T05:02:11.957Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T05:02:11.957Z",
-                "updatedAt": "2023-05-17T05:02:11.957Z"
-            },
-            {
-                "id": 9,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 880,
-                "operation_response": "Success",
-                "date": "2023-05-17T05:04:17.130Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T05:04:17.130Z",
-                "updatedAt": "2023-05-17T05:04:17.130Z"
-            },
-            {
-                "id": 10,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 870,
-                "operation_response": "Success",
-                "date": "2023-05-17T05:05:14.989Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T05:05:14.989Z",
-                "updatedAt": "2023-05-17T05:05:14.989Z"
-            },
-            {
-                "id": 11,
-                "operation_id": 1,
-                "user_id": 1,
-                "amount": 10,
-                "user_balance": 860,
-                "operation_response": "Success",
-                "date": "2023-05-17T05:06:23.091Z",
-                "deleted": false,
-                "createdAt": "2023-05-17T05:06:23.091Z",
-                "updatedAt": "2023-05-17T05:06:23.091Z"
-            }
-        ],
-        "metadata": {
-            "totalCount": 24,
-            "currentPage": 1,
-            "totalPages": 3
-        }
-    };
-
-    // Set initial values
-    this.currentPage = this.data.metadata.currentPage;
-    this.totalPages = this.data.metadata.totalPages;
-  },
-  methods: {
-    changePage(page) {
-      if (page >= 1 && page <= this.totalPages) {
-        this.currentPage = page;
-      }
+      this.filteredData = this.data.records
+        .filter((record) => {
+          return (
+            record.id.toString().includes(this.filterText) ||
+            record.operation_id.toString().includes(this.filterText) ||
+            record.user_id.toString().includes(this.filterText) ||
+            record.amount.toString().includes(this.filterText) ||
+            record.user_balance.toString().includes(this.filterText) ||
+            record.operation_response.includes(this.filterText) ||
+            record.date.includes(this.filterText)
+          );
+        })
+        .slice(start, end);
     }
-  }
+  },
 };
 </script>
