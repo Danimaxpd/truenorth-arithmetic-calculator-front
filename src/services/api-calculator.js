@@ -22,7 +22,7 @@ export default {
       const response = await api.get(`/api/${apiVersion}/records/filter?${params}`);
       return response.data
     } catch (error) {
-      throw new Error(error.message)
+      throw new Error(error)
     }
   },
   async deletedRecord(record_id) {
@@ -30,7 +30,7 @@ export default {
       const response = await api.delete(`/api/${apiVersion}/records/by_id/${record_id}`);
       return response.data
     } catch (error) {
-      throw new Error(error.message)
+      throw new Error(error)
     }
   },
   async createOperation(bodyData) {
@@ -38,7 +38,11 @@ export default {
       const response = await api.post(`/api/${apiVersion}/calculator/operation`, bodyData);
       return response.data
     } catch (error) {
-      throw new Error(error)
+      if (error.response.status === 400) {
+        throw new Error(error.response.data.data.message);
+      }
+
+      throw new Error(error);
     }
   },
   async login(username, password) {
