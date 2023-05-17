@@ -77,7 +77,7 @@
               <v-sheet
                 min-height="70vh"
                 rounded="lg"
-                class="pt-4"
+                class="p-4"
               >
                 <router-view />
               </v-sheet>
