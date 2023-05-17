@@ -12,7 +12,7 @@ import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
 import { md3 } from 'vuetify/blueprints'
 
-const myCustomLightTheme = {
+const calculatorTheme = {
   dark: false,
   colors: {
     background: '#27272f',
@@ -30,9 +30,9 @@ const myCustomLightTheme = {
 
 const vuetify = createVuetify({
   theme: {
-    defaultTheme: 'myCustomLightTheme',
+    defaultTheme: 'calculatorTheme',
     themes: {
-      myCustomLightTheme,
+      calculatorTheme,
     },
   },
   blueprint: md3,
