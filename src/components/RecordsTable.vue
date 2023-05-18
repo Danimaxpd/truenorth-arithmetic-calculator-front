@@ -304,7 +304,7 @@ export default {
     },
     constructFilters(){
       const start = (this.currentPage - 1) * this.recordsPerPage;
-      const end = start + this.recordsPerPage;
+      const end = this.recordsPerPage;
 
       const filters = [];
 
