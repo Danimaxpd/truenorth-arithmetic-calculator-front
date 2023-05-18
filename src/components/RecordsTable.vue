@@ -13,13 +13,13 @@
             <v-card-text>
               <v-text-field
                 v-model="filterText"
-                :loading="loading"
                 density="compact"
                 variant="solo"
                 label="Search in table"
                 append-inner-icon="mdi-magnify"
                 single-line
                 hide-details
+                @update:model-value="filteredRecords()"
               />
             </v-card-text>
           </v-card>
@@ -37,6 +37,7 @@
               :items="headers"
               label="Order By"
               variant="underlined"
+              @update:model-value="fetchData()"
             />
           </div>
         </v-col>
@@ -50,9 +51,10 @@
           >
             <v-select
               v-model="orderByDirection"
-              :items="orderByDirections"
+              :items="orderDirections"
               label="Direction"
               variant="underlined"
+              @update:model-value="fetchData()"
             />
           </div>
         </v-col>
@@ -69,6 +71,7 @@
               :items="arrRecordsPerPage"
               label="Records Per Page"
               variant="underlined"
+              @update:model-value="fetchData()"
             />
           </div>
         </v-col>
@@ -200,7 +203,6 @@ export default {
   },
   mounted() {
     this.fetchData();
-    this.filteredRecords();
   },
   methods: {
     async changePage(page) {
@@ -262,7 +264,7 @@ export default {
         filters.push(filterEnd);
       }
 
-      const filterOrderBy = this.stringFilter('orderBy', `"${this.orderBy}": "${this.orderByDirection}"`);
+      const filterOrderBy = this.stringFilter('orderBy', `{"${this.orderBy}": "${this.orderByDirection}"}`);
       if (this.orderBy) {
         filters.push(filterOrderBy);
       }
@@ -272,11 +274,9 @@ export default {
         filters.push(filterWhere);
       }
 
-      return filters.join('');
+      return filters.join('&');
     },
     filteredRecords() {
-      const start = (this.currentPage - 1) * this.recordsPerPage;
-      const end = start + this.recordsPerPage;
       this.filteredData = this.data.records
         .filter((record) => {
           return (
@@ -288,8 +288,7 @@ export default {
             record.operation_response.includes(this.filterText) ||
             record.date.includes(this.filterText)
           );
-        })
-        .slice(start, end);
+        });
     }
   },
 };
