@@ -88,6 +88,7 @@
           <th>User Balance</th>
           <th>Operation Response</th>
           <th>Date</th>
+          <th>Delete</th>
         </tr>
       </thead>
       <tbody>
@@ -102,6 +103,14 @@
           <td>{{ record.user_balance }}</td>
           <td>{{ record.operation_response }}</td>
           <td>{{ record.date }}</td>
+          <td>
+            <v-icon
+              color="error"
+              @click="deleteRecord(record.id)"
+            >
+              mdi-delete
+            </v-icon>
+          </td>
         </tr>
       </tbody>
     </table>
@@ -147,6 +156,13 @@
         </li>
       </ul>
     </nav>
+    <v-snackbar
+      v-model="snackbar.show"
+      :color="snackbar.color"
+      :timeout="snackbar.timeout"
+    >
+      {{ snackbar.message }}
+    </v-snackbar>
   </div>
 </template>
 
@@ -199,6 +215,12 @@ export default {
           totalPages: 0,
         },
       },
+      snackbar: {
+        show: false,
+        message: '',
+        color: '',
+        timeout: 3000
+      },
     };
   },
   mounted() {
@@ -225,6 +247,25 @@ export default {
         this.snackbar = {
           show: true,
           message: "Error getting Records Info",
+          color: "error",
+          timeout: 3000,
+        };
+      }
+    },
+    async deleteRecord(id) {
+      try {
+        await calculatorApi.deletedRecord(id);
+        this.fetchData();
+        this.snackbar = {
+          show: true,
+          message: `Deleted record with ID: ${id}`,
+          color: "success",
+          timeout: 3000,
+        };
+      } catch (error) {
+        this.snackbar = {
+          show: true,
+          message: `Error deleting record with ID: ${id}`,
           color: "error",
           timeout: 3000,
         };
