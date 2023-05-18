@@ -6,7 +6,7 @@ const apiVersion = process.env.VUE_APP_CALCULATOR_API_VERSION;
 
 const vuexData = localStorage.getItem('vuex');
 const vuexObject = JSON.parse(vuexData);
-const token = vuexObject.token;
+const token = vuexObject?.token;
 const api = axios.create({
   baseURL: apiUrl,
   headers: {
