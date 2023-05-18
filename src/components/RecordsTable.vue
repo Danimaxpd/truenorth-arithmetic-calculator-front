@@ -104,12 +104,19 @@
           <td>{{ record.operation_response }}</td>
           <td>{{ record.date }}</td>
           <td>
-            <v-icon
+            <v-btn
+              density="compact"
+              icon="mdi-delete"
               color="error"
               @click="deleteRecord(record.id)"
             >
-              mdi-delete
-            </v-icon>
+              <v-tooltip
+                activator="parent"
+                location="start"
+              >
+                Do you want to delete?
+              </v-tooltip>
+            </v-btn>
           </td>
         </tr>
       </tbody>
