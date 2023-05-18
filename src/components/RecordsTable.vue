@@ -179,6 +179,7 @@ import calculatorApi from "@/services/api-calculator";
 export default {
   data() {
     return {
+      userId: null,
       filterText: "",
       currentPage: 1,
       totalPages: 0,
@@ -231,9 +232,14 @@ export default {
     };
   },
   mounted() {
+    this.getUserId();
     this.fetchData();
   },
   methods: {
+    getUserId() {
+      const token = this.$store.getters.getPayloadToken;
+      this.userId = token?.userId
+    },
     async changePage(page) {
       if (page >= 1 && page <= this.totalPages) {
         this.currentPage = page;
@@ -317,7 +323,7 @@ export default {
         filters.push(filterOrderBy);
       }
 
-      const filterWhere = this.stringFilter('where', '{"deleted": false}');
+      const filterWhere = this.stringFilter('where', `{"deleted": false, "user_id":${this.userId}}`);
       if (filterWhere) {
         filters.push(filterWhere);
       }
