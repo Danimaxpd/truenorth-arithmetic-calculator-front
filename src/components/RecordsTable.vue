@@ -37,7 +37,7 @@
               :items="headers"
               label="Order By"
               variant="underlined"
-              @update:model-value="fetchData()"
+              @update:model-value="fetchData(true)"
             />
           </div>
         </v-col>
@@ -54,7 +54,7 @@
               :items="orderDirections"
               label="Direction"
               variant="underlined"
-              @update:model-value="fetchData()"
+              @update:model-value="fetchData(true)"
             />
           </div>
         </v-col>
@@ -71,7 +71,7 @@
               :items="arrRecordsPerPage"
               label="Records Per Page"
               variant="underlined"
-              @update:model-value="fetchData()"
+              @update:model-value="fetchData(true)"
             />
           </div>
         </v-col>
@@ -246,8 +246,11 @@ export default {
         await this.fetchData();
       }
     },
-    async fetchData() {
+    async fetchData(resetPage=false) {
       try {
+        if(resetPage) {
+          this.currentPage = 1;
+        }
         const filters = this.constructFilters();
         const response = await calculatorApi.getRecords(filters);
         const data = response.data;
@@ -303,6 +306,7 @@ export default {
       return result;
     },
     constructFilters(){
+      console.log('filter-->>', this.currentPage, this.recordsPerPage)
       const start = (this.currentPage - 1) * this.recordsPerPage;
       const end = this.recordsPerPage;
 
