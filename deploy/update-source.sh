@@ -1,6 +1,6 @@
 #!/bin/bash
 
-$pipeline_directory=$1
+pipeline_directory=$1
 
 cd $pipeline_directory/.. && \
 	git reset --hard && \
