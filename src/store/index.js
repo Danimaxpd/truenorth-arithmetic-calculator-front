@@ -45,6 +45,7 @@ export default createStore({
       state.token = null;
       state.isAuthenticated = false;
       state.username = null;
+      localStorage.removeItem('vuex');
     },
   },
   actions: {
