@@ -15,6 +15,18 @@ const api = axios.create({
   }
 })
 
+api.interceptors.request.use(
+  (config) => {
+    const updatedVuexData = localStorage.getItem('vuex');
+    const updatedVuexObject = JSON.parse(updatedVuexData);
+    const updatedToken = updatedVuexObject?.token;
+    config.headers.Authorization = `Bearer ${updatedToken}`;
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 
 export default {
   async getRecords(params) {
